@@ -6,6 +6,29 @@ on:
     - 'v*'
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.25'
+
+      - name: Test
+        run: go tool task test
+
+      - name: Build
+        run: go tool task build-all
+
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: "bin/*"
+
   docker:
     runs-on: ubuntu-latest
     steps:

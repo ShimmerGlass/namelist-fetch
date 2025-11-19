@@ -25,6 +25,19 @@ tasks:
     cmds:
       - go build -o {{ .BIN }} .
 
+  build-all:
+    sources:
+      - "**/*.go"
+
+    cmds:
+      - for:
+          matrix:
+            OS: ['windows', 'linux', 'darwin']
+            ARCH: ['amd64', 'arm64']
+
+        cmd:
+          GOOS={{ .ITEM.OS }} GOARCH={{ .ITEM.ARCH }} go build -o {{ .BIN }}-{{ .ITEM.OS }}-{{ .ITEM.ARCH }}{{ if eq .ITEM.OS "windows" }}.exe{{ end }} .
+
 
   ### tests
 
