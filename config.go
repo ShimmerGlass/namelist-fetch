@@ -11,11 +11,11 @@ import (
 
 // config env vars
 const (
-	envListenAddr      = "DBL_LISTEN_ADDR"
-	envTargetFile      = "DBL_TARGET_FILE"
-	envTempDir         = "DBL_TEMP_DIR"
-	envBlocklistPrefix = "DBL_BLOCKLIST_" // prefix, eg: DAL_BLOCKLIST_MYLIST
-	envInterval        = "DBL_INTERVAL"
+	envListenAddr      = "NLF_LISTEN_ADDR"
+	envTargetFile      = "NLF_TARGET_FILE"
+	envTempDir         = "NLF_TEMP_DIR"
+	envBlocklistPrefix = "NLF_BLOCKLIST_" // prefix, eg: NLF_BLOCKLIST_MYLIST
+	envInterval        = "NLF_INTERVAL"
 )
 
 // config vars

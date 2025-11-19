@@ -7,6 +7,6 @@ RUN go tool task build
 
 FROM alpine AS run
 
-COPY --from=build /app/bin/dnscrypt-blocklist-dl /dnscrypt-blocklist-dl
+COPY --from=build /app/bin/namelist-fetch /namelist-fetch
 
-CMD [ "/dnscrypt-blocklist-dl" ]
+CMD [ "/namelist-fetch" ]

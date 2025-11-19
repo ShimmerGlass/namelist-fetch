@@ -26,4 +26,4 @@ jobs:
         with:
           push: true
           platforms: linux/arm64,linux/amd64
-          tags: shimmerglass/dnscrypt-blocklist-dl:latest,shimmerglass/dnscrypt-blocklist-dl:${{ github.ref_name }}
+          tags: shimmerglass/namelist-fetch:latest,shimmerglass/namelist-fetch:${{ github.ref_name }}
