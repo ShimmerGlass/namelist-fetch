@@ -15,4 +15,9 @@ var (
 		Name: "dnscrypt_blocklist_list_reload_time_seconds",
 		Help: "Time taken to reload a list",
 	}, []string{"name"})
+
+	metricListLastFetch = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "dnscrypt_blocklist_list_last_fetch_unix",
+		Help: "Last unix timestamp when the list was refreshed",
+	}, []string{"name"})
 )

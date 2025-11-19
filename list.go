@@ -77,6 +77,7 @@ func loadList(list blockList) error {
 	elapsed := time.Since(start)
 	log.Info("list reloaded", "time", time.Since(start))
 	metricListReloadTime.WithLabelValues(list.Name).Set(elapsed.Seconds())
+	metricListLastFetch.WithLabelValues(list.Name).SetToCurrentTime()
 
 	return nil
 }

@@ -10,8 +10,6 @@ import (
 )
 
 func main() {
-	startServer()
-
 	err := run()
 	if err != nil {
 		slog.Error(err.Error())
@@ -24,6 +22,8 @@ func run() error {
 	if err != nil {
 		return err
 	}
+
+	startServer()
 
 	tick := time.Tick(cfgInterval)
 	for ; ; <-tick {
