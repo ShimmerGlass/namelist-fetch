@@ -11,11 +11,11 @@ import (
 
 // config env vars
 const (
-	envListenAddr      = "NLF_LISTEN_ADDR"
-	envTargetFile      = "NLF_TARGET_FILE"
-	envTempDir         = "NLF_TEMP_DIR"
-	envBlocklistPrefix = "NLF_BLOCKLIST_" // prefix, eg: NLF_BLOCKLIST_MYLIST
-	envInterval        = "NLF_INTERVAL"
+	envListenAddr = "NLF_LISTEN_ADDR"
+	envTargetFile = "NLF_TARGET_FILE"
+	envTempDir    = "NLF_TEMP_DIR"
+	envListPrefix = "NLF_LIST_" // prefix, eg: NLF_LIST_
+	envInterval   = "NLF_INTERVAL"
 )
 
 // config vars
@@ -23,11 +23,11 @@ var (
 	cfgListenAddr string
 	cfgTargetFile string
 	cfgTempDir    string
-	cfgBlocklists []blockList
+	cfgBlocklists []listConfig
 	cfgInterval   time.Duration
 )
 
-type blockList struct {
+type listConfig struct {
 	Name string
 	URL  string
 }
@@ -68,12 +68,12 @@ func loadConfig() error {
 	return nil
 }
 
-func getLists() ([]blockList, error) {
-	lists := []blockList{}
+func getLists() ([]listConfig, error) {
+	lists := []listConfig{}
 
 	for _, ev := range os.Environ() {
 		k, listURL, _ := strings.Cut(ev, "=")
-		_, name, ok := strings.Cut(k, envBlocklistPrefix)
+		_, name, ok := strings.Cut(k, envListPrefix)
 		if !ok {
 			continue
 		}
@@ -83,14 +83,14 @@ func getLists() ([]blockList, error) {
 			return nil, fmt.Errorf("blocklist %q: invalid url: %w", name, err)
 		}
 
-		lists = append(lists, blockList{
+		lists = append(lists, listConfig{
 			Name: name,
 			URL:  listURL,
 		})
 	}
 
 	if len(lists) == 0 {
-		return nil, fmt.Errorf("no blocklist configured, set %sXXX", envBlocklistPrefix)
+		return nil, fmt.Errorf("no blocklist configured, set %sXXX", envListPrefix)
 	}
 
 	return lists, nil

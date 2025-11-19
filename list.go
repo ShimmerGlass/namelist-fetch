@@ -30,7 +30,7 @@ func reloadLists() {
 	}
 }
 
-func loadList(list blockList) error {
+func loadList(list listConfig) error {
 	log := slog.With("name", list.Name, "url", list.URL)
 	start := time.Now()
 
@@ -166,7 +166,7 @@ func mergeLists() error {
 	return nil
 }
 
-func mergeList(list blockList, to *bufio.Writer, seen map[string]struct{}) error {
+func mergeList(list listConfig, to *bufio.Writer, seen map[string]struct{}) error {
 	inPath := filepath.Join(cfgTempDir, list.Name)
 	in, err := os.Open(inPath)
 	if errors.Is(err, os.ErrNotExist) {
