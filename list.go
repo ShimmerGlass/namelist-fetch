@@ -15,12 +15,17 @@ import (
 
 func reloadLists() {
 	for _, list := range cfgBlocklists {
+		start := time.Now()
 		err := loadList(list)
+		elapsed := time.Since(start)
+		metricListReloadTime.WithLabelValues(list.Name).Set(elapsed.Seconds())
+
 		if err != nil {
 			slog.With("name", list.Name, "url", list.URL).Error("reload failed", "err", err.Error())
 			metricListStatus.WithLabelValues(list.Name).Set(0)
 		} else {
 			metricListStatus.WithLabelValues(list.Name).Set(1)
+			metricListLastFetch.WithLabelValues(list.Name).SetToCurrentTime()
 		}
 	}
 
@@ -30,12 +35,12 @@ func reloadLists() {
 	}
 }
 
-func loadList(list listConfig) error {
+func loadList(list listConfig) (err error) {
 	log := slog.With("name", list.Name, "url", list.URL)
-	start := time.Now()
 
 	targetPath := filepath.Join(cfgTempDir, list.Name)
 	targetPathTmp := targetPath + ".tmp"
+	etagPath := targetPath + ".etag"
 
 	targetTmp, err := os.OpenFile(targetPathTmp, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o644)
 	if err != nil {
@@ -47,10 +52,28 @@ func loadList(list listConfig) error {
 		_ = os.Remove(targetPathTmp)
 	}()
 
+	etag, err := os.ReadFile(etagPath)
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
+
 	log.Debug("loading list")
-	res, err := http.Get(list.URL)
+	req, err := http.NewRequest(http.MethodGet, list.URL, nil)
 	if err != nil {
 		return err
+	}
+	if len(etag) > 0 {
+		req.Header.Add("If-None-Match", string(etag))
+	}
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+
+	if res.StatusCode == http.StatusNotModified {
+		log.Info("list did not change")
+		return nil
 	}
 
 	if res.StatusCode >= 400 {
@@ -74,10 +97,14 @@ func loadList(list listConfig) error {
 		return err
 	}
 
-	elapsed := time.Since(start)
-	log.Info("list reloaded", "time", time.Since(start))
-	metricListReloadTime.WithLabelValues(list.Name).Set(elapsed.Seconds())
-	metricListLastFetch.WithLabelValues(list.Name).SetToCurrentTime()
+	if etag := res.Header.Get("ETag"); etag != "" && !strings.HasPrefix(etag, "W/") {
+		err = os.WriteFile(etagPath, []byte(etag), 0o644)
+		if err != nil {
+			return err
+		}
+	}
+
+	log.Info("list updated")
 
 	return nil
 }

@@ -13,7 +13,16 @@ tasks:
 
   run:
     deps: [build]
+    env:
+      NLF_LISTEN_ADDR: :8765
+      NLF_INTERVAL: 30s
+      NLF_TARGET_FILE: ./testdir/blocked-names.txt
+      NLF_TEMP_DIR: ./testdir/parts
+      NLF_LIST_ADS: https://media.githubusercontent.com/media/zachlagden/Pi-hole-Optimized-Blocklists/refs/heads/main/lists/advertising.txt
+      NLF_LIST_TRACK: https://media.githubusercontent.com/media/zachlagden/Pi-hole-Optimized-Blocklists/refs/heads/main/lists/tracking.txt
+
     cmds:
+      - mkdir -p testdir{,/parts}
       - ./{{ .BIN }} {{.CLI_ARGS}}
 
   ### build
